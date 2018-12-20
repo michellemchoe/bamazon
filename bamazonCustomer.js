@@ -51,25 +51,36 @@ function takeUserAction() {
 }
 
 function checkStock(u_pID, u_pQuantity) {
-    connection.query("SELECT stock_quantity FROM products WHERE item_id = ?", [u_pID], function (err, res) {
-        if (err) throw err;
+    connection.query("SELECT stock_quantity FROM products WHERE item_id = ?",
+        [u_pID], function (err, res) {
 
-        if (res[0].stock_quantity >= u_pQuantity) {
-            console.log("enuf");
-        }
-        else {
-            // lowStock(uRequest.pID);
-            console.log("not enuf");
-        }
-    });
+            if (err) throw err;
+
+            if (res[0].stock_quantity >= u_pQuantity) {
+                console.log("enuf");
+
+            }
+            else {
+                console.log("not enuf");
+                inquirer
+                    .prompt([
+                        {
+                            type: "confirm",
+                            message: "Looks like we only have " +
+                                res[0].stock_quantity + " " +
+                                res[0].product_name + " left in stock. \n" +
+                                "Would you like to edit the quantity to order?",
+                            name: "yesEQ"
+                        }
+                    ])
+                    .then (function(uRequest){
+                        if (uRequest.yesEQ){
+                            console.log("yes pressed");
+                        }
+                        else {
+                            console.log("no pressed");
+                        }
+                    })
+            }
+        });
 }
-
-// function lowStock(prodID) {
-//     inquirer
-//         .prompt([
-//             {
-//                 type: "confirm",
-//                 message: "  Unfortunately, we only have " + 
-//             }
-//         ])
-// }
