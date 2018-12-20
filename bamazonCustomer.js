@@ -45,16 +45,31 @@ function takeUserAction() {
                 name: "pQuantity"
             }
         ])
-        .then (function(uRequest) {
-            connection.query("SELECT stock_quantity FROM products WHERE item_id = ?", [uRequest.pID], function(err, res){
-                if (err) throw err;
-
-                if(res[0].stock_quantity >= uRequest.pQuantity){
-                    console.log("enuf");
-                }
-                else {
-                    console.log("not enuf");
-                }
-            });
-        })
+        .then(function (uRequest) {
+            checkStock(uRequest.pID, uRequest.pQuantity);
+        });
 }
+
+function checkStock(u_pID, u_pQuantity) {
+    connection.query("SELECT stock_quantity FROM products WHERE item_id = ?", [u_pID], function (err, res) {
+        if (err) throw err;
+
+        if (res[0].stock_quantity >= u_pQuantity) {
+            console.log("enuf");
+        }
+        else {
+            // lowStock(uRequest.pID);
+            console.log("not enuf");
+        }
+    });
+}
+
+// function lowStock(prodID) {
+//     inquirer
+//         .prompt([
+//             {
+//                 type: "confirm",
+//                 message: "  Unfortunately, we only have " + 
+//             }
+//         ])
+// }

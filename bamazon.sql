@@ -3,7 +3,7 @@ CREATE DATABASE bamazon_db;
 USE bamazon_db;
 
 CREATE TABLE products(
-    item_id INTEGER(10) AUTO_INCREMENT NOT NULL,
+    item_id INTEGER AUTO_INCREMENT NOT NULL,
     product_name VARCHAR(50),
     department_name VARCHAR(50),
     price DECIMAL(12,2),
@@ -29,6 +29,5 @@ INSERT INTO products(product_name, department_name, price, stock_quantity)
 VALUES("Ham", "Meat", 10, 4);
 INSERT INTO products(product_name, department_name, price, stock_quantity)
 VALUES("Ice Cream", "Frozen Foods", 4, 9);
-INSERT INTO
- products(product_name, department_name, price, stock_quantity)
+INSERT INTO products(product_name, department_name, price, stock_quantity)
 VALUES("Jump Rope", "Fitness", 8, 3);
