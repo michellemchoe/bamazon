@@ -41,7 +41,7 @@ function takeUserAction() {
             },
             {
                 type: "input",
-                message: "Quantity:",
+                message: "Quantity:  ",
                 name: "pQuantity"
             }
         ])
@@ -51,14 +51,17 @@ function takeUserAction() {
 }
 
 function checkStock(u_pID, u_pQuantity) {
-    connection.query("SELECT stock_quantity FROM products WHERE item_id = ?",
+    connection.query("SELECT stock_quantity, product_name FROM products WHERE item_id = ?",
         [u_pID], function (err, res) {
 
             if (err) throw err;
 
-            if (res[0].stock_quantity >= u_pQuantity) {
-                console.log("enuf");
-
+            if (!res[0]) {
+                console.log("   Invalid product ID. Please try again.\n");
+                takeUserAction();
+            }
+            else if (res[0].stock_quantity >= u_pQuantity) {
+                fulfillOrder(u_pID, u_pQuantity);
             }
             else {
                 console.log("not enuf");
@@ -66,21 +69,60 @@ function checkStock(u_pID, u_pQuantity) {
                     .prompt([
                         {
                             type: "confirm",
-                            message: "Looks like we only have " +
+                            message: "  Looks like we only have " +
                                 res[0].stock_quantity + " " +
                                 res[0].product_name + " left in stock. \n" +
-                                "Would you like to edit the quantity to order?",
+                                "    Would you like to edit the quantity to order?",
                             name: "yesEQ"
                         }
                     ])
-                    .then (function(uRequest){
-                        if (uRequest.yesEQ){
-                            console.log("yes pressed");
+                    .then(function (uRequest) {
+                        if (uRequest.yesEQ) {
+                            inquirer
+                                .prompt([
+                                    {
+                                        type: "input",
+                                        message: "   New Quantity:",
+                                        name: "newQuantity"
+                                    }
+                                ])
+                                .then(function (uRequest) {
+                                    checkStock(u_pID, uRequest.newQuantity);
+                                })
+
                         }
                         else {
-                            console.log("no pressed");
+                            closeBamazonCheck()
                         }
                     })
             }
+
         });
+}
+
+function fulfillOrder(fo_pID, fo_pQuantity){
+    console.log(fo_pID + "<pid         pquantity>" + fo_pQuantity);
+    closeBamazonCheck();
+}
+
+function closeBamazonCheck() {
+    inquirer
+        .prompt([
+            {
+                type: "confirm",
+                message: "   Make another purchase?",
+                name: "newPurchase"
+            }
+        ])
+        .then(function (uRequest) {
+            if (uRequest.newPurchase) {
+                takeUserAction();
+            }
+            else {
+                console.log("\n*******************************************************" +
+                    "\n***   Thank you for shopping at Bamazon. Goodbye.   ***" +
+                    "\n*******************************************************");
+                afterConnection();
+            }
+        })
 }
