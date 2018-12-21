@@ -51,17 +51,16 @@ function takeUserAction() {
 }
 
 function checkStock(u_pID, u_pQuantity) {
-    connection.query("SELECT stock_quantity, product_name FROM products WHERE item_id = ?",
+    connection.query("SELECT * FROM products WHERE item_id = ?",
         [u_pID], function (err, res) {
 
             if (err) throw err;
-
             if (!res[0]) {
                 console.log("   Invalid product ID. Please try again.\n");
                 takeUserAction();
             }
             else if (res[0].stock_quantity >= u_pQuantity) {
-                fulfillOrder(u_pID, u_pQuantity);
+                fulfillOrder(u_pID, res[0].stock_quantity - u_pQuantity);
             }
             else {
                 console.log("not enuf");
@@ -100,9 +99,22 @@ function checkStock(u_pID, u_pQuantity) {
         });
 }
 
-function fulfillOrder(fo_pID, fo_pQuantity){
-    console.log(fo_pID + "<pid         pquantity>" + fo_pQuantity);
-    closeBamazonCheck();
+function fulfillOrder(prodID, newQuantity) {
+
+    connection.query("UPDATE products SET ? WHERE ?", [
+        {
+            stock_quantity: newQuantity
+        },
+        {
+            item_id: prodID
+        }
+    ],
+        function (err, res) {
+            if (err) throw err;
+            closeBamazonCheck();
+
+        }
+    );
 }
 
 function closeBamazonCheck() {
