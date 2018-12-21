@@ -9,7 +9,7 @@ var connection = mysql.createConnection({
     database: "bamazon_db"
 });
 
-connection.connect(function (err) {
+connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     dispProducts();
@@ -60,10 +60,11 @@ function checkStock(u_pID, u_pQuantity) {
                 takeUserAction();
             }
             else if (res[0].stock_quantity >= u_pQuantity) {
+                displayCost(u_pQuantity, res[0].product_name, res[0].price * u_pQuantity);
                 fulfillOrder(u_pID, res[0].stock_quantity - u_pQuantity);
+                closeBamazonCheck();
             }
             else {
-                console.log("not enuf");
                 inquirer
                     .prompt([
                         {
@@ -99,6 +100,11 @@ function checkStock(u_pID, u_pQuantity) {
         });
 }
 
+function displayCost(prodQuantity, prodName, subTotal){
+    console.log("   " + prodQuantity + " " + prodName + " costs $" + subTotal + " before tax.");
+};
+
+
 function fulfillOrder(prodID, newQuantity) {
 
     connection.query("UPDATE products SET ? WHERE ?", [
@@ -111,8 +117,6 @@ function fulfillOrder(prodID, newQuantity) {
     ],
         function (err, res) {
             if (err) throw err;
-            closeBamazonCheck();
-
         }
     );
 }
